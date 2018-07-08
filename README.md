@@ -2,9 +2,9 @@
 Simple Connect-Four game, with a MCTS agent to play against
 
 Usage
-'''
+```
 python game.py
-'''
+```
 
 
 ### agent.py
