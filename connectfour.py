@@ -149,3 +149,27 @@ class ConnectFour:
                 s = s + str(col)
         return str(int(s))
 
+    def heuristic(self, player):
+        score = 0
+        if self.winner == 0:
+            pass
+        elif self.winner == player:
+            score += 10000
+        else:
+            score -= 10000
+        for i in range(6):
+            for j in range(7):
+                center = self.board.spaces[i][j]
+                for d in [[0,0], [0,1], [1,0], [1,1], [-1,1], [1,-1], [0,-1], [-1,0], [-1,-1]]:
+                    try:
+                        adj = self.board.spaces[i+d[0]][j+d[1]]
+                        if center == player:
+                            if center == adj:
+                                score += 1
+                        else:
+                            if center == adj:
+                                score -= 1
+                    except:
+                        pass
+        return score
+

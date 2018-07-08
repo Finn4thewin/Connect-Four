@@ -7,7 +7,8 @@ import pickle
 import threading
 from copy import deepcopy
 from connectfour import ConnectFour
-from agent import Agent
+from min_max_agent import Min_Max_Agent
+from MCTS_agent import MCTS_Agent
 
 # Defining global variables
 pygame.init()
@@ -104,14 +105,17 @@ def agentDecide(agent, cf, decision):
     decision.append(ret)
 
 # Plays a game against the agent
-def one_player(player, bot):
+def one_player(player, bot, algorithm):
     cf = ConnectFour()
     prev_x = -2
     prev_y = -2
     firstClick = False
     firstRun = True
     decision = []
-    agent = Agent(900, bot)
+    if algorithm == "MCTS":
+        agent = MCTS_Agent(900, bot)
+    else:
+        agent = Min_Max_Agent(5, bot)
     while True:
         # Draw the board, and get events
         screen.fill(WHITE)
@@ -228,12 +232,15 @@ def menu():
         # Define rectangles for the buttons
         rect_width = 200
         rect_height = 100
-        twopbut = [SCREEN_WIDTH / 2 - rect_width / 2, 200, rect_width, rect_height]
-        onepbut = [SCREEN_WIDTH / 2 - rect_width / 2, 400, rect_width, rect_height]
+        twopbut = [SCREEN_WIDTH / 2 - rect_width / 2, 100, rect_width, rect_height]
+        onepbut = [SCREEN_WIDTH / 2 - rect_width / 2, 300, rect_width, rect_height]
+        onepbut2 = [SCREEN_WIDTH / 2 - rect_width / 2, 500, rect_width, rect_height]
         # Draw the buttons
         pygame.draw.rect(screen, BRIGHTBLUE, twopbut)
         pygame.draw.rect(screen, BRIGHTBLUE, onepbut)
-        draw_text("One Player", [onepbut[0] + 15, onepbut[1] + 15], BLACK)
+        pygame.draw.rect(screen, BRIGHTBLUE, onepbut2)
+        draw_text("vs MCTS", [onepbut[0] + 15, onepbut[1] + 15], BLACK)
+        draw_text("vs Min Max", [onepbut2[0] + 15, onepbut2[1] + 15], BLACK)
         draw_text("Two Player", [twopbut[0] + 15, twopbut[1] + 15], BLACK)
         # Check if the buttons were clicked on
         (x,y) = pygame.mouse.get_pos()
@@ -242,6 +249,8 @@ def menu():
             decision = 2
         elif m1 and intersects(x, y, onepbut):
             decision = 1
+        elif m1 and intersects(x, y, onepbut2):
+            decision = 3
         pygame.display.flip()
     return decision
 
@@ -249,7 +258,7 @@ def menu():
 def main():
     while True:
         state = menu()
-        if state == 1:
+        if state == 1 or state == 3:
             # Randomly determine colors
             if random.random() > 0.5:
                 player = 1
@@ -257,7 +266,10 @@ def main():
             else:
                 player = 2
                 bot = 1
-            one_player(player, bot)
+            if state == 1:
+                one_player(player, bot, "MCTS")
+            else:
+                one_player(player, bot, "minmax")
         elif state == 2:
             two_player()
 
