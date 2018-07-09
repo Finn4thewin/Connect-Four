@@ -84,7 +84,7 @@ def clamp(n, smallest, largest): return max(smallest, min(n, largest))
 
 # Determines which column the x coordinate belongs to
 def hovered_move(x):
-    return clamp(math.floor(x / 100), 0, 6)
+    return clamp(math.floor(x / (SCREEN_WIDTH / 7)), 0, 6)
 
 def draw_thinking():
     time = pygame.time.get_ticks()

@@ -161,15 +161,16 @@ class ConnectFour:
             for j in range(7):
                 center = self.board.spaces[i][j]
                 for d in [[0,0], [0,1], [1,0], [1,1], [-1,1], [1,-1], [0,-1], [-1,0], [-1,-1]]:
-                    try:
-                        adj = self.board.spaces[i+d[0]][j+d[1]]
-                        if center == player:
-                            if center == adj:
-                                score += 1
-                        else:
-                            if center == adj:
-                                score -= 1
-                    except:
-                        pass
+                    for dist in range(1,4):
+                        try:
+                            adj = self.board.spaces[i+dist*d[0]][j+dist*d[1]]
+                            if center == player:
+                                if center == adj:
+                                    score += 1
+                            else:
+                                if center == adj:
+                                    score -= 1
+                        except:
+                            pass
         return score
 
