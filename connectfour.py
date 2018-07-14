@@ -95,25 +95,24 @@ class Board:
 
     # Checks if someone has won the  game yet
     def check_winner(self):
-        ret = 0
         a_moves = self.available_moves()
 
-        # Checks for a draw first
+        # Check if one of the players have won first
+        for i in range(6):
+            for j in range(7):
+                for d in ['up', 'left', 'dur', 'dul']:
+                    r = self.check_spot(j, i, d)
+                    if r > 0:
+                        return r
+
+        # Checks for a draw
         draw = True
         for move in a_moves:
             if move != 0:
                 draw = False
         if draw:
             return 3
-
-        # Check if one of the players have won
-        for i in range(6):
-            for j in range(7):
-                for d in ['up', 'left', 'dur', 'dul']:
-                    r = self.check_spot(j, i, d)
-                    if r > ret:
-                        return r
-        return ret
+        return 0
 
 # Primary purpose is to manage who's turn it is
 # Otherwise just acts as an interface to the board
@@ -122,12 +121,15 @@ class ConnectFour:
         self.board = Board()
         self.whos_turn = 1
         self.winner = 0
+        self.round = 0
     def reset(self):
         self.board.reset()
         self.whos_turn = 1
         self.winner = 0
+        self.round = 0
     def make_move(self, x):
         y, x = self.board.move(x, self.whos_turn)
+        self.round += 1
         if y != -1:
             self.winner = self.board.check_winner()
             if self.whos_turn == 1:
@@ -152,25 +154,25 @@ class ConnectFour:
     def heuristic(self, player):
         score = 0
         if self.winner == 0:
-            pass
+            for i in range(6):
+                for j in range(7):
+                    center = self.board.spaces[i][j]
+                    for d in [[0,0], [0,1], [1,0], [1,1], [-1,1], [1,-1], [0,-1], [-1,0], [-1,-1]]:
+                        for dist in range(1,4):
+                            try:
+                                adj = self.board.spaces[i+dist*d[0]][j+dist*d[1]]
+                                if center == player:
+                                    if center == adj:
+                                        score += 1
+                                else:
+                                    if center == adj:
+                                        score -= 1
+                            except:
+                                pass
         elif self.winner == player:
-            score += 10000
+            # Prioritizes winning now over winning in five rounds
+            score += 10000 + 1000*(42 - self.round)
         else:
             score -= 10000
-        for i in range(6):
-            for j in range(7):
-                center = self.board.spaces[i][j]
-                for d in [[0,0], [0,1], [1,0], [1,1], [-1,1], [1,-1], [0,-1], [-1,0], [-1,-1]]:
-                    for dist in range(1,4):
-                        try:
-                            adj = self.board.spaces[i+dist*d[0]][j+dist*d[1]]
-                            if center == player:
-                                if center == adj:
-                                    score += 1
-                            else:
-                                if center == adj:
-                                    score -= 1
-                        except:
-                            pass
         return score
 

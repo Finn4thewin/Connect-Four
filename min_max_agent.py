@@ -7,7 +7,7 @@ class Min_Max_Agent:
 
 		def decide(self, cf):
 			root = Min_Max_Tree(self.depth, deepcopy(cf), "max", self.player)
-			best = root.determine_values()
+			best = root.determine_values(float("-inf"), float("inf"))
 			a_moves = cf.a_moves()
 			return a_moves[root.child_values.index(best)]
 
@@ -22,30 +22,41 @@ class Min_Max_Tree:
 			self.leaf = False
 			self.value = -99999
 		self.children = []
+		self.child_values = []
 		self.max_min = max_min
 		self.cf = cf
 		self.a_moves = self.cf.a_moves()
 		self.depth = depth
-		if not self.leaf:
+		self.player = player
+
+	def determine_values(self, a, b):
+		if self.leaf or self.value != -99999:
+			return self.value
+
+		if self.max_min == "max":
+			v = float("-inf")
 			for move in self.a_moves:
 				new_cf = deepcopy(self.cf)
 				new_cf.make_move(move)
-				if self.max_min == "max":
-					self.children.append(Min_Max_Tree(depth - 1, new_cf, "min", player))
-				else:
-					self.children.append(Min_Max_Tree(depth - 1, new_cf, "max", player))
-
-	def determine_values(self):
-		if self.leaf or self.value != -99999:
-			return self.value
+				child = Min_Max_Tree(self.depth - 1, new_cf, "min", self.player)
+				child_v = child.determine_values(a, b)
+				self.child_values.append(child_v)
+				v = max(v, child_v)
+				a = max(a, v)
+				if a >= b:
+					break
+			return v
 		else:
-			self.child_values = []
-			for child in self.children:
-				self.child_values.append(child.determine_values())
-			if self.max_min == "max":
-				self.value = max(self.child_values)
-			else:
-				self.value = min(self.child_values)
-
-		return self.value
+			v = float("inf")
+			for move in self.a_moves:
+				new_cf = deepcopy(self.cf)
+				new_cf.make_move(move)
+				child = Min_Max_Tree(self.depth - 1, new_cf, "max", self.player)
+				child_v = child.determine_values(a, b)
+				self.child_values.append(child_v)
+				v = min(v, child_v)
+				b = min(b, v)
+				if a >= b:
+					break
+			return v
 
