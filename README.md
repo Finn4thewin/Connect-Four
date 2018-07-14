@@ -5,3 +5,4 @@ Usage
 ```
 python game.py 
 ```
+the Min-Max agent is significantly harder to beat.
