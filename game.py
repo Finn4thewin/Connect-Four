@@ -113,7 +113,7 @@ def one_player(player, bot, algorithm):
     firstRun = True
     decision = []
     if algorithm == "MCTS":
-        agent = MCTS_Agent(900, bot)
+        agent = MCTS_Agent(400, bot)
     else:
         agent = Min_Max_Agent(5, bot)
     while True:
